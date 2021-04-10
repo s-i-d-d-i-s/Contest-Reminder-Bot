@@ -4,7 +4,7 @@ import json
 import time
 import datetime
 
-TIME_LIMIT = 25000
+TIME_LIMIT = 60*60+2
 
 id_to_platform= {
     2:'Codechef',
@@ -12,7 +12,10 @@ id_to_platform= {
     93:'Atcoder',
     102: 'Leetcode',
     35: 'Google',
-    73: 'Hackerearth'
+    73: 'Hackerearth',
+    123: 'Codedrills',
+    12:'Topcoder',
+    117:'BinarySearch'
 }
 
 
@@ -25,13 +28,11 @@ def get_formatted_contest_desc(id_str, start, duration, url, max_duration_len):
 
 
 def getFutureContest(res):
-	desc = "**About to start in 1 hour**"
+	desc = "**About to start in 1 hour <@&829804662571270205> **"
 	embed = discord.Embed(description=desc, color=discord.Colour.gold())
 
 	if len(res)==0:
-		desc = "**No Recent Contest**"
-		embed = discord.Embed(description=desc, color=discord.Colour.gold())
-		return embed
+		return None
 	
 	def convert(seconds): 
 		seconds = seconds % (24 * 3600) 
@@ -56,7 +57,8 @@ def getFutureContest(res):
 
 
 def getNextContest():
-    current_time = time.strftime('%Y-%m-%dT%H:%M:%S')
+    current_time = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+	
     url = f"https://clist.by/api/v1/contest/?start__gt={current_time}&order_by=start&username=s5960r&api_key=2e6046e37a8c58f5f13464bea345d4ef5b17acbe"
     data = json.loads(requests.get(url).content)['objects']
     return data
@@ -71,11 +73,12 @@ def getRecentContests():
         link = data['href']
         dur = data['duration']
         time_left = int(datetime.datetime.timestamp(datetime.datetime.strptime(start_time,'%Y-%m-%dT%H:%M:%S')))
-        time_left= int(time_left-time.time())
+        cur_time = datetime.datetime.timestamp(datetime.datetime.utcnow())
+        time_left= int(time_left-cur_time)
         if time_left <= TIME_LIMIT and platform in id_to_platform.keys():
-        	if id_to_platform[platform] in res.keys():
-        		res[id_to_platform[platform]].append([name,dur,start_time,link])
-        	else:
-        		res[id_to_platform[platform]]=list()
-        		res[id_to_platform[platform]].append([name,dur,start_time,link])
+            if id_to_platform[platform] in res.keys():
+                res[id_to_platform[platform]].append([name,dur,start_time,link])
+            else:
+                res[id_to_platform[platform]]=list()
+                res[id_to_platform[platform]].append([name,dur,start_time,link])
     return res
