@@ -5,7 +5,7 @@ import time
 import datetime
 
 TIME_LIMIT = 60*60+2
-
+from .constants import REMINDER_CHANNELS
 id_to_platform= {
     2:'Codechef',
     1:'Codeforces',
@@ -27,8 +27,8 @@ def get_formatted_contest_desc(id_str, start, duration, url, max_duration_len):
     return desc
 
 
-def getFutureContest(res):
-	desc = "**About to start in 1 hour <@&829804662571270205> **"
+def getFutureContest(res,platform):
+	desc = f"**About to start in 1 hour <@&{REMINDER_CHANNELS[platform+'_Role']}> **"
 	embed = discord.Embed(description=desc, color=discord.Colour.gold())
 
 	if len(res)==0:
@@ -59,8 +59,11 @@ def getFutureContest(res):
 def getNextContest():
     current_time = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
 	
-    url = f"https://clist.by/api/v1/contest/?start__gt={current_time}&order_by=start&username=s5960r&api_key=2e6046e37a8c58f5f13464bea345d4ef5b17acbe"
-    data = json.loads(requests.get(url).content)['objects']
+    url = f"https://clist.by/api/v1/contest/?start__gt={current_time}&order_by=start"
+    headers = {
+        'Authorization': 'ApiKey btech15060.18:534ebe6eb3d4e07ca265ca963bf2a32658efe530'
+    }
+    data = json.loads(requests.get(url, headers=headers).content)['objects']
     return data
 
 def getRecentContests():
@@ -81,4 +84,34 @@ def getRecentContests():
             else:
                 res[id_to_platform[platform]]=list()
                 res[id_to_platform[platform]].append([name,dur,start_time,link])
+    return res
+
+def scale_username(a,ln):
+	a=str(a)
+	while(len(a)<ln):
+		a=a+" "
+	longer = False
+	if len(a)>ln:
+		longer = True
+	while len(a)>ln:
+		a = a[:-1]
+	if longer:
+		a = a[:-3]
+		a += "..."
+	return a
+
+def getRecentContestsAll():
+    all_contests = getNextContest()
+    res = []
+    for data in all_contests:
+        name = data['event']
+        platform = data['resource']['id']
+        start_time = data['start']
+        link = data['href']
+        dur = data['duration']
+        time_left = int(datetime.datetime.timestamp(datetime.datetime.strptime(start_time,'%Y-%m-%dT%H:%M:%S')))
+        cur_time = datetime.datetime.timestamp(datetime.datetime.utcnow())
+        time_left= int(time_left-cur_time)
+        if platform in id_to_platform.keys() and platform!=73:
+            res.append([scale_username(name,20),dur,time_left,id_to_platform[platform]])
     return res
