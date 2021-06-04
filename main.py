@@ -3,7 +3,6 @@ from discord.ext import commands
 import asyncio
 import random
 import os
-from cogs.Utils.constants import TOKEN
 
 
 ## Setup Client
@@ -42,6 +41,6 @@ async def on_member_remove(member):
 
 
 #Add Your Bot Token
-token = TOKEN
+token = os.getenv('CR_TOKEN')
 
 client.run(token)
