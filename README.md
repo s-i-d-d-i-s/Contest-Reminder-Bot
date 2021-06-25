@@ -1,4 +1,4 @@
-# RemindMe-Bot
+# Contest-Reminder-Bot
 Discord Bot for Programming Contest Reminders
 
 ## Goals
