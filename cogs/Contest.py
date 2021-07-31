@@ -8,7 +8,13 @@ import os
 import time
 import pickle
 
+def getCurrentTime():
+	from datetime import datetime
+	from pytz import timezone    
 
+	india = timezone('Asia/Kolkata')
+	in_time = datetime.now(india)
+	return in_time.strftime('%H:%M %p %d-%m-%Y')
 
 class Contests(commands.Cog):
 	"""docstring for Contests"""
@@ -77,6 +83,7 @@ class Contests(commands.Cog):
 			cnt+=1
 		clist = '```\n'+str(t)+'\n```'
 		embed = discord.Embed(title='Upcoming Contests.',description=clist)
+
 		await contest_list.send(embed=embed)
 
 
@@ -117,6 +124,7 @@ class Contests(commands.Cog):
 			cnt+=1
 		clist = '```\n'+str(t)+'\n```'
 		embed = discord.Embed(title='Upcoming Contests.',description=clist)
+		embed.set_footer(text=f'Last Updated on {getCurrentTime()} IST')
 		await msg.edit(embed=embed)
 
 	async def clean_it(self,data):
