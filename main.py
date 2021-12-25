@@ -4,6 +4,20 @@ import asyncio
 import random
 import os
 
+## Check Scheduler
+
+from datetime import datetime
+day = datetime.now().day
+half = os.getenv('HALF')
+
+if half == '1' and day <= 15:
+	print("Exiting")
+	exit(0)
+elif half == '0' and day > 15:
+	print("Exiting")
+	exit(0)
+	
+
 
 ## Setup Client
 intents = discord.Intents(messages = True, guilds = True, reactions = True, members = True, presences = True)
@@ -41,6 +55,8 @@ async def on_member_remove(member):
 
 
 #Add Your Bot Token
-token = os.getenv('CR_TOKEN')
+token = os.getenv('CR_TOKEN',"NA")
+if token == 'NA':
+	token = open('DebugFiles/localKey.txt').read()
 
 client.run(token)
