@@ -16,7 +16,11 @@ if half == '1' and day <= 15:
 elif half == '0' and day > 15:
 	print("Exiting")
 	exit(0)
-	
+
+if day <= 15:
+	print("Working in First Half")
+else:
+	print("Working in Second Half")
 
 
 ## Setup Client
